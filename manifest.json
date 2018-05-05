@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "ThreeJS demos",
+  "name": "ThreeJS demos made by Carsten Høyer",
   "icons": [
     {
       "src": "favicon.ico",
