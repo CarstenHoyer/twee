@@ -1,27 +1,54 @@
-import React, { Component } from 'react'
-import logo from './logo.svg'
-import threeEntryPoint from './threejs/threeEntryPoint'
+import React, { Component } from 'react';
+import { BrowserRouter as Router, Route, NavLink } from 'react-router-dom'
+import Loadable from 'react-loadable'
 import './App.css'
 
-class App extends Component {
+const Loading = () => <div>Loading...</div>;
+
+const routes = [
+  { component: 'Home', name: '/', path: '/' },
+  { component: 'RandomWalker', name: 'Random Walker', path: '/random-walker' },
+  { component: 'PerlinWalker', name: 'Perlin Walker', path: '/perlin-walker' },
+]
+
+const routingElements = routes.map((route, i) => {
+  const loadable = Loadable({
+    loader: () => import(`./routes/${route.component}`),
+    loading: Loading,
+  })
+  return <Route key={i} exact path={`${process.env.PUBLIC_URL}${route.path}`} component={loadable}/>
+})
+
+const menu = () => {
+  const items = routes.map((route, i) => {
+    return (
+      <li key={i}>
+        <NavLink exact to={`${process.env.PUBLIC_URL}${route.path}`}>{route.name}</NavLink>
+      </li>
+    )
+  })
+  return (
+    <ul className='App-menu'>
+      {items}
+    </ul>
+  )
+}
+
+export default class App extends Component {
   componentDidMount () {
-    threeEntryPoint(this.threeRootElement)
+    document.title = 'ThreeJS Demos'
   }
 
   render () {
     return (
-      <div className='App'>
-        <header className='App-header'>
-          <img src={logo} className='App-logo' alt='logo' />
-          <h1 className='App-title'>Welcome to React</h1>
-        </header>
-        <p className='App-intro'>
-          To get started, edit <code>src/App.js</code> and save to reload.
-        </p>
-        <div ref={(element) => { this.threeRootElement = element }} />
-      </div>
+      <Router>
+        <div className='App-container'>
+          {menu()}
+          <div className='App-content'>
+            {routingElements.map(route => route)}
+          </div>
+        </div>
+      </Router>
     )
   }
 }
-
-export default App

@@ -16,7 +16,7 @@ export default canvas => {
 
   function buildScene () {
     const scene = new THREE.Scene()
-    scene.background = new THREE.Color('#000')
+    // scene.background = new THREE.Color( 0xff0000 );
     return scene
   }
 
@@ -40,13 +40,15 @@ export default canvas => {
     const aspectRatio = width / height
     const fieldOfView = 60
     const nearPlane = 1
-    const farPlane = 100
-    return new THREE.PerspectiveCamera(
+    const farPlane = 10000
+    const camera = new THREE.PerspectiveCamera(
       fieldOfView,
       aspectRatio,
       nearPlane,
       farPlane
     )
+    camera.position.set(0, 0, 1000)
+    return camera
   }
 
   function createSceneSubjects (scene) {
