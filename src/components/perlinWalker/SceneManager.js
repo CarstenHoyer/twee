@@ -24,7 +24,9 @@ export default class SceneManager {
   }
 
   buildScene () {
-    return new THREE.Scene()
+    const scene = new THREE.Scene()
+    // scene.background = new THREE.Color(0xcc00cc)
+    return scene
   }
 
   buildRender ({ width, height }) {
@@ -45,7 +47,7 @@ export default class SceneManager {
 
   buildCamera ({ width, height }) {
     const aspectRatio = width / height
-    const fieldOfView = 60
+    const fieldOfView = 40
     const nearPlane = 1
     const farPlane = 10000
     const camera = new THREE.PerspectiveCamera(
@@ -54,14 +56,18 @@ export default class SceneManager {
       nearPlane,
       farPlane
     )
-    camera.position.set(0, 0, 1000)
+    camera.position.set(0, 0, 20)
     return camera
   }
 
   createSceneSubjects (scene) {
     const sceneSubjects = [
       new GeneralLights(scene),
-      new SceneSubject(scene)
+      new SceneSubject(
+        scene,
+        this.visibleWidthAtZDepth(0, this.camera),
+        this.visibleHeightAtZDepth(0, this.camera)
+      )
     ]
     return sceneSubjects
   }
@@ -86,5 +92,22 @@ export default class SceneManager {
     this.camera.updateProjectionMatrix()
 
     this.renderer.setSize(width, height)
+  }
+
+  visibleHeightAtZDepth (depth, camera) {
+    // compensate for cameras not positioned at z=0
+    const cameraOffset = camera.position.z
+    if (depth < cameraOffset) depth -= cameraOffset
+    else depth += cameraOffset
+
+    // vertical fov in radians
+    const vFOV = camera.fov * Math.PI / 180
+    // Math.abs to ensure the result is always positive
+    return 2 * Math.tan(vFOV / 2) * Math.abs(depth)
+  }
+
+  visibleWidthAtZDepth (depth, camera) {
+    const height = this.visibleHeightAtZDepth(depth, camera)
+    return height * camera.aspect
   }
 }

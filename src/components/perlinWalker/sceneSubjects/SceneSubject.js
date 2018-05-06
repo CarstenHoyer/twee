@@ -3,15 +3,17 @@ import * as THREE from 'three'
 import dat from 'dat.gui'
 
 export default class SceneSubject {
-  constructor (scene) {
+  constructor (scene, width, height) {
+    this.width = width
+    this.height = height
     this.MAX_POINTS = 500
     this.scene = scene
     this.noise = new Noise(Math.random())
     this.tx = 0
     this.ty = 10000
-    this.smoothness = 1000
+    this.smoothness = 30
     this.gui = new dat.GUI()
-    this.gui.add(this, 'smoothness', 1, 1000)
+    this.gui.add(this, 'smoothness', 1, 100)
     this.init()
   }
 
@@ -27,13 +29,11 @@ export default class SceneSubject {
     geometry.addAttribute('position', new THREE.BufferAttribute(positions, 3))
     geometry.setDrawRange(0, this.drawCount)
 
-    const material = new THREE.LineBasicMaterial({ color: 0xff0000, linewidth: 2 })
+    const material = new THREE.LineBasicMaterial({ color: 0xff0000, linewidth: 20 })
 
     this.line = new THREE.Line(geometry, material)
     this.scene.add(this.line)
     this.updatePositions()
-    this.line.geometry.attributes.position.needsUpdate = true
-    this.line.material.color.setHSL(Math.random(), 1, 0.5)
   }
 
   update (time) {
@@ -45,8 +45,12 @@ export default class SceneSubject {
     this.updatePositions()
   }
 
-  map (n, start1, stop1, start2, stop2) {
-    return n * stop2
+  map (x, fromMin, fromMax, toMin, toMax) {
+    const fromRange = Math.abs(fromMax - fromMin)
+    const toRange = Math.abs(toMax - toMin)
+    const fromX = fromRange * x
+    const ratio = toRange / fromRange
+    return fromX * ratio
   }
 
   updatePositions () {
@@ -54,15 +58,16 @@ export default class SceneSubject {
     let x, y
     x = y = Math.random()
     let index = 0
-    const [width, height] = [1179, 555]
     for (let i = 0, l = this.MAX_POINTS; i < l; i++) {
       positions[ index++ ] = x
       positions[ index++ ] = y
-      index++
-      x = this.map(this.noise.perlin2(x / this.smoothness, this.tx), -1, 1, 0, width)
-      y = this.map(this.noise.perlin2(y / this.smoothness, this.ty), -1, 1, 0, height)
-      this.tx += 0.01
-      this.ty += 0.01
+      positions[ index++ ] = 0
+      // x = this.width / 2
+      // y = 0
+      x += this.map(this.noise.perlin2(x / this.smoothness, this.tx), -1, 1, -1 * this.width / 2, this.width / 2) * 0.1
+      y += this.map(this.noise.perlin2(y / this.smoothness, this.ty), -1, 1, -1 * this.height / 2, this.height / 2) * 0.1
+      this.tx += 0.1
+      this.ty += 0.1
     }
   }
 }
