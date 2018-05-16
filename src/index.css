@@ -1,8 +1,11 @@
 @import url('https://fonts.googleapis.com/css?family=Ubuntu:300');
 
-body {
+* {
   margin: 0;
   padding: 0;
+}
+
+body {
   font-family: 'Ubuntu', sans-serif;
   background-color: #21252b;
 }

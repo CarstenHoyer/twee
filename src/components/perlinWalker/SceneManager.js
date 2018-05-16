@@ -1,6 +1,7 @@
 import * as THREE from 'three'
 import GeneralLights from './sceneSubjects/GeneralLights'
 import SceneSubject from './sceneSubjects/SceneSubject'
+import Square from './sceneSubjects/Square'
 
 export default class SceneManager {
   constructor (canvas) {
@@ -56,7 +57,7 @@ export default class SceneManager {
       nearPlane,
       farPlane
     )
-    camera.position.set(0, 0, 20)
+    camera.position.set(0, 0, 200)
     return camera
   }
 
@@ -83,13 +84,21 @@ export default class SceneManager {
   }
 
   onWindowResize () {
-    const { width, height } = this.canvas
-
+    const { width, height } = this.canvas.getBoundingClientRect()
+    
     this.screenDimensions.width = width
     this.screenDimensions.height = height
 
     this.camera.aspect = width / height
     this.camera.updateProjectionMatrix()
+
+    for (let i = 1; i < this.sceneSubjects.length; i++) {
+      this.sceneSubjects[i].onWindowResize(
+        this.visibleWidthAtZDepth(0, this.camera),
+        this.visibleHeightAtZDepth(0, this.camera)
+      )
+    }
+
 
     this.renderer.setSize(width, height)
   }
@@ -102,12 +111,23 @@ export default class SceneManager {
 
     // vertical fov in radians
     const vFOV = camera.fov * Math.PI / 180
+
     // Math.abs to ensure the result is always positive
     return 2 * Math.tan(vFOV / 2) * Math.abs(depth)
   }
 
   visibleWidthAtZDepth (depth, camera) {
-    const height = this.visibleHeightAtZDepth(depth, camera)
-    return height * camera.aspect
+    // compensate for cameras not positioned at z=0
+    const cameraOffset = camera.position.z
+    if (depth < cameraOffset) depth -= cameraOffset
+    else depth += cameraOffset
+
+    const vFOV = camera.fov * Math.PI / 180
+    const hFOV = 2 * Math.atan(Math.tan(vFOV / 2) * camera.aspect)
+    return 2 * Math.tan((hFOV / 2)) * Math.abs(depth)
+    // const height = this.visibleHeightAtZDepth(depth, camera)
+
+    // const hFOV = height * camera.aspect
+    // return height * camera.aspect
   }
 }

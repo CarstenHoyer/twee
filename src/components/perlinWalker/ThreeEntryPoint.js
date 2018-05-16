@@ -5,6 +5,10 @@ export default class ThreeEntryPoint {
     this.canvas = this.createCanvas(document, containerElement)
     this.sceneManager = new SceneManager(this.canvas)
     this.resizeCanvas = this.resizeCanvas.bind(this)
+    // this.draw = false
+    // setInterval(() => {
+    //   this.draw = true
+    // }, 100)
     this.bindEventListeners()
     this.render()
   }
@@ -30,7 +34,7 @@ export default class ThreeEntryPoint {
   resizeCanvas () {
     this.canvas.style.width = '100%'
     this.canvas.style.height = '100%'
-
+    // this.canvas.style.backgroundColor = 'grey'
     this.canvas.width = this.canvas.offsetWidth
     this.canvas.height = this.canvas.offsetHeight
 
@@ -40,6 +44,9 @@ export default class ThreeEntryPoint {
   render (time) {
     if (!this.canvas) return
     window.requestAnimationFrame(this.render.bind(this))
+    // if (this.draw) {
+    // this.draw = false
     this.sceneManager.update()
+    // }
   }
 }
