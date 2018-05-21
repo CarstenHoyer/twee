@@ -9,6 +9,7 @@ const routes = [
   { component: 'Home', name: '/', path: '/' },
   { component: 'RandomWalker', name: 'Random Walker', path: '/random-walker' },
   { component: 'PerlinWalker', name: 'Perlin Walker', path: '/perlin-walker' },
+  { component: 'SimpleFractals', name: 'Simple Fractals', path: '/simple-fractals' },
 ]
 
 const routingElements = routes.map((route, i) => {
